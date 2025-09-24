@@ -7,99 +7,134 @@ const protect = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// Signup
+// ------------------ Signup ------------------ //
+// Student Signup
 router.post('/signup', async (req, res) => {
-  const { name, email, password } = req.body;
+    const { name, email, password } = req.body;
 
-  try {
-    let user = await User.findOne({ email });
-    if (user) return res.status(400).json({ message: 'User already exists' });
+    try {
+        let user = await User.findOne({ email });
+        if (user) return res.status(400).json({ message: 'User already exists' });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    user = new User({ name, email, password: hashedPassword });
-    await user.save();
+        const hashedPassword = await bcrypt.hash(password, 10);
+        user = new User({ name, email, password: hashedPassword });
+        await user.save();
 
-    res.status(201).json({ message: 'User registered successfully' });
-
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
+        res.status(201).json({ message: 'Student registered successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
-// Login
+// Temporary Admin Creation Route (remove after first use)
+router.post('/create-admin', async (req, res) => {
+    const { name, email, password } = req.body;
+
+    try {
+        let user = await User.findOne({ email });
+        if (user) return res.status(400).json({ message: 'Admin already exists' });
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        user = new User({ name, email, password: hashedPassword, role: 'admin' });
+        await user.save();
+
+        res.status(201).json({ message: 'Admin created successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Teacher Signup
+router.post('/teacher/signup', async (req, res) => {
+    const { name, email, password } = req.body;
+
+    try {
+        let user = await User.findOne({ email });
+        if (user) return res.status(400).json({ message: 'User already exists' });
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        user = new User({ name, email, password: hashedPassword, role: 'teacher' });
+        await user.save();
+
+        res.status(201).json({ message: 'Teacher registered successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// ------------------ Login ------------------ //
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+    const { email, password } = req.body;
 
-  try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+    try {
+        const user = await User.findOne({ email });
+        if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
-    // Generate 4-digit OTP
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+        const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
-    // Send OTP via email
-    await sendEmail(user.email, "Your OTP Code", `Your OTP is ${otp}`);
+        await sendEmail(user.email, "Your OTP Code", `Your OTP is ${otp}`);
 
-    // Store OTP and email temporarily in HttpOnly cookie, expires in 5 mins
-    res.cookie('otpData', JSON.stringify({ email, otp }), {
-      httpOnly: true,
-      secure: false, // true if using HTTPS
-      maxAge: 5 * 60 * 1000 // 5 minutes
-    });
+        res.cookie('otpData', JSON.stringify({ email, otp }), {
+            httpOnly: true,
+            secure: false, 
+            maxAge: 5 * 60 * 1000 
+        });
 
-    res.json({ message: 'OTP sent to your email' });
+        res.json({ message: 'OTP sent to your email' });
 
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
-// otp-verify
+// ------------------ OTP Verification ------------------ //
+// ------------------ OTP Verification ------------------ //
 router.post('/verify-otp', async (req, res) => {
-  const { otp } = req.body;
+    const { otp, email } = req.body; // ✅ get email from frontend now
 
-  const otpData = req.cookies.otpData;
-  if (!otpData) return res.status(400).json({ message: 'OTP expired. Please login again' });
+    if (!email) return res.status(400).json({ message: 'Email not provided' });
+    if (!otp) return res.status(400).json({ message: 'OTP not provided' });
 
-  const { email, otp: storedOtp } = JSON.parse(otpData);
+    try {
+        const otpData = req.cookies.otpData;
+        if (!otpData) return res.status(400).json({ message: 'OTP expired. Please login again' });
 
-  if (otp !== storedOtp) return res.status(400).json({ message: 'Invalid OTP' });
+        const { otp: storedOtp } = JSON.parse(otpData);
 
-  try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'User not found' });
+        if (otp !== storedOtp) return res.status(400).json({ message: 'Invalid OTP' });
 
-    // OTP verified → remove temporary cookie
-    res.clearCookie('otpData');
+        const user = await User.findOne({ email });
+        if (!user) return res.status(400).json({ message: 'User not found' });
 
-    // Issue JWT
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.clearCookie('otpData');
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: false,
-      maxAge: 60 * 60 * 1000 // 1 hour
-    });
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.json({ message: 'Login successful with OTP' });
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            maxAge: 60 * 60 * 1000 
+        });
 
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
+        res.json({ message: 'Login successful with OTP', role: user.role });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
-// Dashboard 
+
+// ------------------ Dashboard ------------------ //
 router.get('/dashboard', protect, (req, res) => {
-  res.json({ message: 'Welcome to the Dashboard', userId: req.user });
+    res.json({ message: 'Welcome to the Dashboard', user: req.user });
 });
 
-// Logout
+// ------------------ Logout ------------------ //
 router.post('/logout', (req, res) => {
-  res.clearCookie('token');
-  res.json({ message: 'Logged out successfully' });
+    res.clearCookie('token');
+    res.json({ message: 'Logged out successfully' });
 });
 
 module.exports = router;
