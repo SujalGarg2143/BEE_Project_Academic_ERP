@@ -4,16 +4,16 @@ const teacherOnly = require('../middleware/teacherMiddleware');
 
 const router = express.Router();
 
-// ---------------- Teacher Dashboard ----------------
+// dashboard
 router.get('/', teacherOnly, async (req, res) => {
     res.json({ message: `Welcome to your Teacher Dashboard, ${req.user.name}!` });
 });
 
-// ---------------- Get All Students ----------------
+// student list
 router.get('/students', teacherOnly, async (req, res) => {
     try {
         const students = await User.find({ role: 'student' })
-            .select('name email batch attendance marks'); // Return relevant info only
+            .select('name email batch attendance marks'); 
         res.json({ students });
     } catch (err) {
         console.error(err);
@@ -21,8 +21,7 @@ router.get('/students', teacherOnly, async (req, res) => {
     }
 });
 
-// ---------------- Mark Attendance ----------------
-// Expects: { studentEmail: "email_here", status: "present" / "absent" }
+// mark attendance
 router.post('/attendance', teacherOnly, async (req, res) => {
     const { studentEmail, status } = req.body;
 
@@ -38,8 +37,7 @@ router.post('/attendance', teacherOnly, async (req, res) => {
     res.json({ message: 'Attendance marked', student });
 });
 
-// ---------------- Post Marks ----------------
-// Expects: { studentEmail: "email_here", subject: "Maths", marks: 85 }
+// upload marks
 router.post('/marks', teacherOnly, async (req, res) => {
     const { studentEmail, subject, marks } = req.body;
 
@@ -55,8 +53,7 @@ router.post('/marks', teacherOnly, async (req, res) => {
     res.json({ message: 'Marks added', student });
 });
 
-// ---------------- Post Updates ----------------
-// Expects: { title: "Update Title", content: "Update content" }
+// updates post
 router.post('/updates', teacherOnly, async (req, res) => {
     const { title, content } = req.body;
 

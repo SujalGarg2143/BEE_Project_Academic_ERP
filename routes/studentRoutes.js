@@ -10,9 +10,8 @@ router.get('/', protectStudent, async (req, res) => {
         const student = await User.findById(req.user._id)
             .select('name email batch attendance marks updates');
 
-        // Transform arrays into objects for frontend
-        const attendanceObj = {};
-        student.attendance.forEach(record => {
+            const attendanceObj = {};
+            student.attendance.forEach(record => {
             attendanceObj[record.date] = record.status;
         });
 

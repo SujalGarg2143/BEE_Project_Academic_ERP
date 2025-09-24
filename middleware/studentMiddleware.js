@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../model/User');
 
-// Protect routes and check for student role
 const student = async (req, res, next) => {
     try {
         const token = req.cookies.token;

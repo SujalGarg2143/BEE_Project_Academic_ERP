@@ -74,13 +74,13 @@ class OTPManager {
 
     try {
 
-      const email = sessionStorage.getItem("otpEmail"); // ✅ get email from sessionStorage
+      const email = sessionStorage.getItem("otpEmail"); 
       if (!email) throw new Error("Email not found. Please login again.");
 
       const res = await fetch("http://localhost:5000/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // sends httpOnly cookie automatically
+        credentials: "include", 
         body: JSON.stringify({ otp: otpCode, email:this.email }),
       });
 

@@ -19,13 +19,13 @@ const userSchema = new mongoose.Schema({
 
     role: {
         type: String,
-        enum: ['student', 'admin','teacher'], // only these two roles for now
+        enum: ['student', 'admin','teacher'], 
         default: 'student'
     },
 
     batch: {
         type: String,
-        default: null // admin assigns later
+        default: null 
     },
     attendance: [
         {

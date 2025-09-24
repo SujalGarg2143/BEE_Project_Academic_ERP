@@ -84,7 +84,7 @@ async handleSubmit(e) {
 
         alert(response.data.message || "OTP sent to your email")
 
-        // ✅ Store email in sessionStorage for OTP page
+        // Store email in sessionStorage for OTP page
         sessionStorage.setItem("otpEmail", this.formData.email)
 
         window.location.href = "otp.html"

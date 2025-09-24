@@ -156,7 +156,7 @@
 
       const studentEmail = document.getElementById("studentEmailM").value;
       const subject = document.getElementById("subject").value;
-      const marks = Number(document.getElementById("marks").value); // convert to number here
+      const marks = Number(document.getElementById("marks").value); 
 
       try {
         await axios.post(API + "/marks", { studentEmail, subject, marks }, { withCredentials: true });

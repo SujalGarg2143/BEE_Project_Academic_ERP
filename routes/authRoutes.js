@@ -7,14 +7,13 @@ const protect = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// ------------------ Signup ------------------ //
 // Student Signup
 router.post('/signup', async (req, res) => {
     const { name, email, password } = req.body;
 
     try {
         let user = await User.findOne({ email });
-        if (user) return res.status(400).json({ message: 'User already exists' });
+        if (user) return res.status(400).json({ message: 'Student already exists' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
         user = new User({ name, email, password: hashedPassword });
@@ -26,7 +25,7 @@ router.post('/signup', async (req, res) => {
     }
 });
 
-// Temporary Admin Creation Route (remove after first use)
+// Admin Signup
 router.post('/create-admin', async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -62,7 +61,7 @@ router.post('/teacher/signup', async (req, res) => {
     }
 });
 
-// ------------------ Login ------------------ //
+// Login
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -90,10 +89,9 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// ------------------ OTP Verification ------------------ //
-// ------------------ OTP Verification ------------------ //
+// Otp-verify
 router.post('/verify-otp', async (req, res) => {
-    const { otp, email } = req.body; // ✅ get email from frontend now
+    const { otp, email } = req.body; 
 
     if (!email) return res.status(400).json({ message: 'Email not provided' });
     if (!otp) return res.status(400).json({ message: 'OTP not provided' });
@@ -126,12 +124,12 @@ router.post('/verify-otp', async (req, res) => {
 });
 
 
-// ------------------ Dashboard ------------------ //
+// dashboard
 router.get('/dashboard', protect, (req, res) => {
     res.json({ message: 'Welcome to the Dashboard', user: req.user });
 });
 
-// ------------------ Logout ------------------ //
+// logout
 router.post('/logout', (req, res) => {
     res.clearCookie('token');
     res.json({ message: 'Logged out successfully' });
