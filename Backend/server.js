@@ -1,5 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
+dotenv.config();
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const connectDB = require('./db/connectDB');
@@ -14,7 +15,6 @@ const studentRoutes = require('./routes/studentRoutes');
 const noticeRoutes = require("./routes/noticeRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 
-dotenv.config();
 connectDB();
 
 const app = express();
