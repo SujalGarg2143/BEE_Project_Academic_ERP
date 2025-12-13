@@ -78,7 +78,8 @@ router.post('/login', async (req, res) => {
 
         res.cookie('otpData', JSON.stringify({ email, otp }), {
             httpOnly: true,
-            secure: false, 
+            secure: true, 
+            sameSite: 'none',
             maxAge: 5 * 60 * 1000 
         });
 
@@ -113,7 +114,8 @@ router.post('/verify-otp', async (req, res) => {
 
         res.cookie('token', token, {
             httpOnly: true,
-            secure: false,
+            secure: true,
+            sameSite: 'none',
             maxAge: 60 * 60 * 1000 
         });
 
