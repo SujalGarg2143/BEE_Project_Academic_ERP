@@ -14,22 +14,6 @@ export default function AdminDashboard() {
   });
   const [notices, setNotices] = useState([]);
 
-  // Initial load
-  useEffect(() => {
-    loadStudents();
-    loadTotals();
-  }, []);
-
-  // Load notices 
-  useEffect(() => {
-    if (activeTab === "notices") loadNotices();
-  }, [activeTab]);
-
-  useEffect(() => {
-    const interval = setInterval(loadTotals, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
   async function loadStudents() {
     try {
       const data = await adminApi.getStudents();
@@ -106,6 +90,22 @@ export default function AdminDashboard() {
       alert("Failed to post notice");
     }
   }
+
+  // Initial load
+  useEffect(() => {
+    loadStudents();
+    loadTotals();
+  }, []);
+
+  // Load notices 
+  useEffect(() => {
+    if (activeTab === "notices") loadNotices();
+  }, [activeTab]);
+
+  useEffect(() => {
+    const interval = setInterval(loadTotals, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen flex bg-[#0a0f14] text-white">
