@@ -46,7 +46,9 @@ export default function StudentDashboard() {
 
   // Socket for live notifications
   useEffect(() => {
-    const socket = io("http://localhost:5000");
+    const socket = io(process.env.NEXT_PUBLIC_API_BASE, {
+      withCredentials: true,
+    });
     socket.emit("registerRole", { role: "student" });
 
     socket.on("notification", (data) => {
@@ -88,8 +90,8 @@ export default function StudentDashboard() {
               key={t.id}
               onClick={() => setActiveTab(t.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition ${activeTab === t.id
-                  ? "bg-green-600/90 shadow-md"
-                  : "bg-white/5 hover:bg-white/10"
+                ? "bg-green-600/90 shadow-md"
+                : "bg-white/5 hover:bg-white/10"
                 }`}
             >
               {t.icon}
