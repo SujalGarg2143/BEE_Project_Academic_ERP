@@ -19,24 +19,26 @@ connectDB();
 
 const app = express();
 
-const corsOptions = {
+app.use(cors({
   origin: [
     "http://localhost:3000",
     "https://bee-project-flgb.vercel.app"
   ],
   credentials: true,
-};
-
-
-app.use(cors(corsOptions));
+}));
 
 
 // socket setup
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: corsOptions,
+  cors: {
+    origin: [
+      "http://localhost:3000",
+      "https://bee-project-flgb.vercel.app"
+    ],
+    credentials: true,
+  },
   transports: ["websocket"],
-  credentials: true 
 });
 
 app.use((req, res, next) => {
