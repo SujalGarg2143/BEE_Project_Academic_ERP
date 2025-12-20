@@ -19,31 +19,24 @@ connectDB();
 
 const app = express();
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://bee-project-flgb.vercel.app" 
-];
-
-app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = `The CORS policy for this site does not allow access from the specified Origin.`;
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
+const corsOptions = {
+  origin: [
+    "http://localhost:3000",
+    "https://bee-project-flgb.vercel.app"
+  ],
   credentials: true,
-}));
+};
+
+
+app.use(cors(corsOptions));
 
 
 // socket setup
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: {
-        origin: allowedOrigins,  
-        credentials: true
-    }
+  cors: corsOptions,
+  transports: ["websocket"],
+  credentials: true 
 });
 
 app.use((req, res, next) => {
