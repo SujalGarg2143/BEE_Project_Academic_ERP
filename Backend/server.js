@@ -38,7 +38,7 @@ const io = new Server(server, {
     ],
     credentials: true,
   },
-  transports: ["websocket"],
+  transports: ["websocket", "polling"],
 });
 
 app.use((req, res, next) => {

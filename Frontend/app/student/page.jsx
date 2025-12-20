@@ -51,7 +51,7 @@ export default function StudentDashboard() {
       "https://bee-project-academic-erp.onrender.com";
 
     const socket = io(SOCKET_URL, {
-      transports: ["websocket"],
+      transports: ["websocket","polling"],
       withCredentials: true,
     });
 
