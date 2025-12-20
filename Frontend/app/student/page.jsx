@@ -46,11 +46,18 @@ export default function StudentDashboard() {
 
   // Socket for live notifications
   useEffect(() => {
-    const socket = io(process.env.NEXT_PUBLIC_API_BASE, {
+    const SOCKET_URL =
+      process.env.NEXT_PUBLIC_API_BASE ??
+      "https://bee-project-academic-erp.onrender.com";
+
+    const socket = io(SOCKET_URL, {
       transports: ["websocket"],
       withCredentials: true,
     });
-    socket.emit("registerRole", { role: "student" });
+
+    socket.on("connect", () => {
+      socket.emit("registerRole", { role: "student" });
+    });
 
     socket.on("notification", (data) => {
       setNotifications((prev) => [...prev, data.message]);
