@@ -47,7 +47,6 @@ export default function StudentDashboard() {
   // Socket for live notifications
   useEffect(() => {
     const SOCKET_URL =
-      process.env.NEXT_PUBLIC_API_BASE ??
       "https://bee-project-academic-erp.onrender.com";
 
     const socket = io(SOCKET_URL, {
